@@ -1,0 +1,39 @@
+PODS:
+  - LiveKit (0.8.5):
+    - PromisesSwift
+    - Starscream (~> 4.0.0)
+    - SwiftProtobuf
+    - WebRTC-SDK
+  - PromisesObjC (2.0.0)
+  - PromisesSwift (2.0.0):
+    - PromisesObjC (= 2.0.0)
+  - Starscream (4.0.4)
+  - SwiftProtobuf (1.18.0)
+  - WebRTC-SDK (92.4515.10)
+
+DEPENDENCIES:
+  - LiveKit (from `/Users/baveku/Downloads/client-sdk-ios`)
+
+SPEC REPOS:
+  trunk:
+    - PromisesObjC
+    - PromisesSwift
+    - Starscream
+    - SwiftProtobuf
+    - WebRTC-SDK
+
+EXTERNAL SOURCES:
+  LiveKit:
+    :path: "/Users/baveku/Downloads/client-sdk-ios"
+
+SPEC CHECKSUMS:
+  LiveKit: 7b19baa15d6b60b31893f6dd941e85a92b2c6e66
+  PromisesObjC: 68159ce6952d93e17b2dfe273b8c40907db5ba58
+  PromisesSwift: e0b2a6433469efb0b83a2b84c62a2abab8e5e5d4
+  Starscream: 5178aed56b316f13fa3bc55694e583d35dd414d9
+  SwiftProtobuf: c3c12645230d9b09c72267e0de89468c5543bd86
+  WebRTC-SDK: dabc6471c193814aeb0ad9e6712052567acff601
+
+PODFILE CHECKSUM: ac0d0871829930a55dd39c7d94e1e29164aff75e
+
+COCOAPODS: 1.11.2

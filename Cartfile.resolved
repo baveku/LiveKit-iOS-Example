@@ -1,0 +1,5 @@
+git "file:///Users/baveku/Downloads/client-sdk-ios" "878e2d5affc06223ea40c1e6cca8ec2dc6806af4"
+github "apple/swift-protobuf" "1.18.0"
+github "daltoniam/Starscream" "4.0.4"
+github "google/Promises" "2.0.0"
+github "webrtc-sdk/Specs" "92.4515.10"
