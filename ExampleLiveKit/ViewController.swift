@@ -24,6 +24,7 @@ class ViewController: UIViewController {
         let token: String = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Mzc0NjQzNzgsImlzcyI6IkFQSWtQOGEydmpaaWc5RyIsImp0aSI6IjE4MTgxOCIsIm5iZiI6MTYzNDg3MjM3OCwic3ViIjoiYmFjaGFiY2VyIiwidmlkZW8iOnsicm9vbSI6InRlc3QiLCJyb29tSm9pbiI6dHJ1ZX19.WWU_E2GJXoV_L9qqXH2rvjsZqNzkEz6WiQc5KR6Xshk"
         LiveKit.isDebug = true
         self.room = Room(connectOptions: .init(url: url, token: token), delegate: self)
+        self.room.enableVideo()
     }
     
     var parView: [String: VideoView] = [:]
@@ -77,10 +78,12 @@ class ViewController: UIViewController {
     }
     
     @IBAction func didTapConnect() {
+        UIApplication.shared.isIdleTimerDisabled = true
         room.connect()
     }
     
     @IBAction func didTapDisconnect() {
+        UIApplication.shared.isIdleTimerDisabled = false
         remoteView.subviews.forEach { view in
             view.removeFromSuperview()
         }
@@ -92,50 +95,15 @@ class ViewController: UIViewController {
     }
     
     @IBAction func enabledVideo(_ button: UIButton) {
-        if let videoTracks = room.localParticipant?.videoTracks, let localTrack = videoTracks.first(where: {$0.value.name == "localVideo"}).map({$0.value})?.track {
-            if localTrack.state == .started {
-                button.setTitle("Started", for: .normal)
-                try? room.localParticipant?.unpublishTrack(track: localTrack)
-                localView.subviews.forEach { view in
-                    view.removeFromSuperview()
-                }
-            }
-        } else {
-            button.setTitle("Stopped", for: .normal)
-            DispatchQueue.global(qos: .background).async {
-                do {
-                    if let local = self.room.localParticipant {
-                        let videoTrack = try LocalVideoTrack.createTrack(name: "localVideo")
-                        _ = self.room.localParticipant?.publishVideoTrack(track: videoTrack)
-                        self.attachVideo(track: videoTrack, participant: local, for: true)
-                    }
-                } catch {
-                    // error publishing
-                }
-            }
-        }
+        guard let local = room.localParticipant else {return}
+        let isEnabled = room.isEnabledVideo
+        isEnabled ? room.disableVideo() : room.enableVideo()
+        button.setTitle(isEnabled ? "Stop" : "Start", for: .normal)
     }
 }
 
 extension ViewController: RoomDelegate {
-    func room(_ room: Room, didConnect isReconnect: Bool) {
-        guard let localParticipant = room.localParticipant, !isReconnect else {
-            return
-        }
-        // perform work in the background, to not block WebRTC threads
-        DispatchQueue.global(qos: .background).async {
-            do {
-                let videoTrack = try LocalVideoTrack.createTrack(name: "localVideo")
-                let audioTrack = LocalAudioTrack.createTrack(name: "localAudio")
-                _ = localParticipant.publishVideoTrack(track: videoTrack)
-                _ = localParticipant.publishAudioTrack(track: audioTrack)
-                self.attachVideo(track: videoTrack, participant: localParticipant, for: true)
-            } catch {
-                // error publishing
-            }
-        }
-        
-    }
+    func room(_ room: Room, didConnect isReconnect: Bool) {}
     
     func room(_ room: Room, participant: RemoteParticipant, didSubscribe trackPublication: RemoteTrackPublication, track: Track) {
         guard let videoTrack = track as? VideoTrack else {
@@ -143,6 +111,27 @@ extension ViewController: RoomDelegate {
         }
         
         attachVideo(track: videoTrack, participant: participant)
+    }
+    
+    func room(_ room: Room, participantDidLeave participant: RemoteParticipant) {
+        if let view = self.parView[participant.sid] {
+            view.removeFromSuperview()
+        }
+        self.parView.removeValue(forKey: participant.sid)
+    }
+    
+    func room(_ room: Room, participant: Participant, didUpdate track: TrackPublication, muted: Bool) {
+        
+    }
+    
+    func room(_ room: Room, participant: LocalParticipant, didEnabledVideo videoTrack: LocalVideoTrack) {
+        self.attachVideo(track: videoTrack, participant: participant, for: true)
+    }
+    
+    func room(_ room: Room, participant: LocalParticipant, didDisabledVideo videoTrack: LocalVideoTrack) {
+        localView.subviews.forEach { view in
+            view.removeFromSuperview()
+        }
     }
 }
 

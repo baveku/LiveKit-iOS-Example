@@ -4,7 +4,7 @@
 target 'ExampleLiveKit' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
-  pod 'LiveKit', :git => "https://github.com/baveku/LiveKit"
+  pod 'LiveKit', :git => "/Users/baveku/Downloads/client-sdk-ios"
   # Pods for ExampleLiveKit
 
 end
